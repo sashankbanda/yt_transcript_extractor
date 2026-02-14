@@ -195,21 +195,33 @@ class YouTubeTranscriptExtractor:
 # Save Output
 # -------------------------
 
-def save_to_file(video_id: str, text: str):
+def save_to_file(video_id: str, text: str, save_txt: bool = True, save_md: bool = True):
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
 
-    file_path = os.path.join(output_dir, f"{video_id}.txt")
+    if save_txt:
+        txt_path = os.path.join(output_dir, f"{video_id}.txt")
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        logger.info(f"Transcript saved to: {txt_path}")
 
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(text)
+    if save_md:
+        md_path = os.path.join(output_dir, f"{video_id}.md")
+        with open(md_path, "w", encoding="utf-8") as f:
+            f.write(f"# Transcript: {video_id}\n\n{text}\n")
+        logger.info(f"Transcript saved to: {md_path}")
 
-    logger.info(f"Transcript saved to: {file_path}")
+    if not save_txt and not save_md:
+        logger.warning("No output format selected. Transcript was not saved.")
 
 
 # -------------------------
 # CLI Entry
 # -------------------------
+
+# Toggle output formats (True = save, False = skip)
+SAVE_TXT = True
+SAVE_MD = True
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -226,7 +238,7 @@ if __name__ == "__main__":
         if not text:
             raise ValueError("Transcript extraction returned empty text")
 
-        save_to_file(video_id, text)
+        save_to_file(video_id, text, save_txt=SAVE_TXT, save_md=SAVE_MD)
         logger.info("Process completed successfully")
 
     except Exception as e:
