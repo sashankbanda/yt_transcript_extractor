@@ -1,0 +1,28 @@
+# youtube-transcript-api
+# yt-dlp
+# faster-whisper
+# ffmpeg-python
+
+# Core transcript extraction
+youtube-transcript-api==0.6.2
+
+# YouTube audio download
+yt-dlp==2024.12.13
+
+# Speech-to-text (Whisper)
+faster-whisper==1.0.3
+ctranslate2==4.4.0
+
+# FFmpeg wrapper (optional but useful)
+ffmpeg-python==0.2.0
+
+# Optional: If running on CPU only, ensure this is installed
+# torch is NOT required for faster-whisper
+
+# If you plan to expose as API later
+# fastapi
+# uvicorn[standard]
+
+# Note:
+# System dependency required:
+# - ffmpeg must be installed on the machine and available in PATH
