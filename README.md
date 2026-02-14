@@ -30,9 +30,17 @@ python youtube_transcript_extractor.py "https://www.youtube.com/watch?v=WWEs82u3
 
 Output saved to: `output/<video_id>.txt`
 
+## Language Support
+
+- **English videos** → captions are picked automatically (no prompt)
+- **Single language (non-English)** → picked automatically
+- **Multiple languages** → you'll be prompted to choose
+- **No captions at all** → Whisper auto-detects the spoken language
+
 ## How It Works
 
 1. Extracts video ID from the URL
-2. Attempts to fetch official YouTube captions
-3. If no captions → downloads audio via `yt-dlp` → transcribes with `faster-whisper` (CPU, int8)
-4. Saves transcript to `output/<video_id>.txt`
+2. Lists all available caption languages
+3. Auto-selects English if available, otherwise prompts user
+4. If no captions → downloads audio via `yt-dlp` → transcribes with `faster-whisper` (CPU, int8)
+5. Saves transcript to `output/<video_id>.txt`

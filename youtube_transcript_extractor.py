@@ -86,8 +86,58 @@ class YouTubeTranscriptExtractor:
     def _get_official_captions(self, video_id: str) -> Optional[str]:
         try:
             logger.info("Attempting to fetch official captions...")
-            transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
-            return " ".join(entry["text"] for entry in transcript_list)
+            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+
+            # Collect all available transcripts
+            available = []
+            for t in transcript_list:
+                available.append(t)
+
+            if not available:
+                logger.warning("No transcripts available")
+                return None
+
+            # Log available languages
+            for t in available:
+                tag = "(auto-generated)" if t.is_generated else "(manual)"
+                logger.info(f"  Available: {t.language} [{t.language_code}] {tag}")
+
+            # Priority: English first
+            selected = None
+
+            # Try English (manual first, then auto-generated)
+            for t in available:
+                if t.language_code.startswith("en") and not t.is_generated:
+                    selected = t
+                    break
+            if not selected:
+                for t in available:
+                    if t.language_code.startswith("en"):
+                        selected = t
+                        break
+
+            # If only one language available, use it directly
+            if not selected and len(available) == 1:
+                selected = available[0]
+
+            # Multiple non-English languages: prompt user
+            if not selected:
+                print("\nMultiple transcript languages found:")
+                for i, t in enumerate(available):
+                    tag = "(auto-generated)" if t.is_generated else "(manual)"
+                    print(f"  [{i + 1}] {t.language} [{t.language_code}] {tag}")
+
+                while True:
+                    choice = input(f"\nSelect language (1-{len(available)}): ").strip()
+                    if choice.isdigit() and 1 <= int(choice) <= len(available):
+                        selected = available[int(choice) - 1]
+                        break
+                    print("Invalid choice. Try again.")
+
+            logger.info(f"Using transcript: {selected.language} [{selected.language_code}]")
+            transcript_data = selected.fetch()
+            return " ".join(entry["text"] for entry in transcript_data)
+
         except TranscriptsDisabled:
             logger.warning("Transcripts are disabled for this video")
             return None
