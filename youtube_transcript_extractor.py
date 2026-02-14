@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 class YouTubeTranscriptExtractor:
     def __init__(self, whisper_model_size: str = "base"):
         logger.info(f"Loading Whisper model: {whisper_model_size}")
-        self.whisper_model = WhisperModel(whisper_model_size)
+        self.whisper_model = WhisperModel(whisper_model_size, device="cpu", compute_type="int8")
         logger.info("Whisper model loaded successfully")
 
     # -------------------------
